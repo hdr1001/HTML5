@@ -15,8 +15,18 @@ function addGistToPage(elem, url) {
       else { //Success
          console.log('Successfully loaded the Gist');
 
-         //Send the Gist content to the console
-         console.log(xhr.response.div);
+         if(xhr.response.files) {
+            //Send the content of the gist(s) to the console
+            Object.keys(xhr.response.files).forEach(key => {
+               let elemGist = document.createElement('p');
+               elemGist.appendChild(document.createTextNode(xhr.response.files[key].content));
+
+               elem.parentNode.replaceChild(elemGist, elem);
+            });
+         }
+         else {
+            console.log('No \"files\" property on the object returned')
+         }
       }
    };
 
@@ -28,22 +38,20 @@ function addGistToPage(elem, url) {
 }
 
 //Locate the gist placeholders & replace them with the gist
-function addGtiHubGists() {
-   function getGitHubGistUrl(owner, id) {
-      return 'https://gist.github.com/' + owner + '/' + id + '.json';
-   }
+function addGitHubGists() {
 
-   document.querySelectorAll('.ghgist').forEach(elem => {
-      console.log('Located placeholder for gist');
+   const apiGitHubGistUrl = 'https://api.github.com/gists/';
 
-      //For this to work a GitHub Gist owner and ID must be specified
-      let sOwner = elem.getAttribute('data-ghowner');
-      let sGistID = elem.getAttribute('data-ghgistid');
+   document.querySelectorAll('.ghgist').forEach(elemDiv => {
+      console.log('Located placeholder for GitHub Gist');
 
-      if(sOwner && sGistID) {
+      //For this to work a GitHub Gist ID must be specified
+      let sGistID = elemDiv.getAttribute('data-ghgistid');
+
+      if(sGistID) {
          console.log('About to add Gist with ID ' + sGistID + ' to the page');
 
-         addGistToPage(elem, getGitHubGistUrl(sOwner, sGistID));
+         addGistToPage(elemDiv, apiGitHubGistUrl + sGistID);
       }
       else {
          console.log('Invalid URL ' + getGitHubGistUrl(sOwner, sGistID));
@@ -55,5 +63,5 @@ function addGtiHubGists() {
 document.addEventListener('DOMContentLoaded', event => {
    console.log('DOM content loaded, hosted on URL ' + window.location);
    
-   addGtiHubGists();
+   addGitHubGists();
 });
