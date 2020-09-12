@@ -1,14 +1,24 @@
 //Create the DOM element node for the GitHub Gist
-function getGitHubGistElem(oGist) {
+function getGitHubGistElem(oGist, htmlUrl) {
+   let arrContent;
+
+   if(oGist.content) {
+      arrContent = oGist.content.split('\n');
+   }
+   else {
+      console.log('🤔, GitHub Gist contains no content');
+      return null;
+   }
+
    let gistTopDiv = document.createElement('div');
    gistTopDiv.setAttribute('class', 'gist')
 
+   let gistFileDiv = document.createElement('div');
+   gistFileDiv.setAttribute('class', 'gist-file');
+
+   let gistBottomDiv = gistTopDiv.appendChild(gistFileDiv);
+
    let gistDiv = document.createElement('div');
-   gistDiv.setAttribute('class', 'gist-file');
-
-   let gistBottomDiv = gistTopDiv.appendChild(gistDiv);
-
-   gistDiv = document.createElement('div');
    gistDiv.setAttribute('class', 'gist-data');
 
    gistBottomDiv = gistBottomDiv.appendChild(gistDiv);
@@ -37,24 +47,56 @@ function getGitHubGistElem(oGist) {
 
    gistBottomDiv.appendChild(gistTable);
 
-   let tr, trLast;
-   let td1, td2;
+   let tr, td1, td2, rowContent;
 
-   tr = document.createElement('tr');
-   td1 = document.createElement('td');
-   td2 = document.createElement('td');
+   for(let i = 0; i < arrContent.length; i++) {
+      rowContent = arrContent[i].trim();
 
-   td1.setAttribute('id', 'file-agist-txt-L1');
-   td1.setAttribute('class', 'blob-num js-line-number');
-   td1.setAttribute('data-line-number', '1');
-
-   td2.setAttribute('id', 'file-agist-txt-LC1');
-   td2.setAttribute('class', 'blob-code blob-code-inner js-file-line');
-   td2.appendChild(document.createTextNode('!!!!!! smiley'))
-
-   gistTable.appendChild(tr).appendChild(td1);
-   tr.appendChild(td2);
+      if(rowContent) {
+         tr = document.createElement('tr');
+         td1 = document.createElement('td');
+         td2 = document.createElement('td');
+      
+         td1.setAttribute('id', 'file-agist-txt-L' + (i + 1));
+         td1.setAttribute('class', 'blob-num js-line-number');
+         td1.setAttribute('data-line-number', (i + 1).toString());
+      
+         td2.setAttribute('id', 'file-agist-txt-LC' + (i + 1));
+         td2.setAttribute('class', 'blob-code blob-code-inner js-file-line');
+         td2.appendChild(document.createTextNode(rowContent));
    
+         tr.appendChild(td1);
+         tr.appendChild(td2);
+         
+         gistTable.appendChild(tr);
+      }
+   }
+
+   gistDiv = document.createElement('div');
+   gistDiv.setAttribute('class', 'gist-meta');
+
+   let anchor = document.createElement('a');
+   anchor.setAttribute('href', oGist.raw_url);
+   anchor.setAttribute('style', 'float:right');
+   anchor.appendChild(document.createTextNode('view raw'));
+
+   gistDiv.appendChild(anchor);
+
+   anchor = document.createElement('a');
+   anchor.setAttribute('href', htmlUrl);
+   anchor.appendChild(document.createTextNode(oGist.filename));
+
+   gistDiv.appendChild(anchor);
+
+   gistDiv.appendChild(document.createTextNode(' hosted with ❤️ by '));
+
+   anchor = document.createElement('a');
+   anchor.setAttribute('href', 'https://github.com');
+   anchor.appendChild(document.createTextNode('GitHub'));
+
+   gistDiv.appendChild(anchor);
+   gistFileDiv.appendChild(gistDiv);
+
    return gistTopDiv;
 }
 
@@ -78,7 +120,7 @@ function addGistToPage(elem, url) {
          if(xhr.response.files) {
             //Send the content of the gist(s) to the console
             Object.keys(xhr.response.files).forEach(key => {
-               let elemGist = getGitHubGistElem(xhr.response.files[key]);
+               let elemGist = getGitHubGistElem(xhr.response.files[key], xhr.response.html_url);
 
                if(elemGist) {
                   elem.parentNode.replaceChild(elemGist, elem);
