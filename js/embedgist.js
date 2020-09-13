@@ -11,7 +11,8 @@ function getGitHubGistElem(oGist, htmlUrl) {
    }
 
    let gistTopDiv = document.createElement('div');
-   gistTopDiv.setAttribute('class', 'gist')
+   gistTopDiv.setAttribute('class', 'gist');
+   gistTopDiv.setAttribute('style', 'max-width:480px;');
 
    let gistFileDiv = document.createElement('div');
    gistFileDiv.setAttribute('class', 'gist-file');
@@ -47,29 +48,25 @@ function getGitHubGistElem(oGist, htmlUrl) {
 
    gistBottomDiv.appendChild(gistTable);
 
-   let tr, td1, td2, rowContent;
+   let tr, td1, td2;
 
    for(let i = 0; i < arrContent.length; i++) {
-      rowContent = arrContent[i].trim();
-
-      if(rowContent) {
-         tr = document.createElement('tr');
-         td1 = document.createElement('td');
-         td2 = document.createElement('td');
-      
-         td1.setAttribute('id', 'file-agist-txt-L' + (i + 1));
-         td1.setAttribute('class', 'blob-num js-line-number');
-         td1.setAttribute('data-line-number', (i + 1).toString());
-      
-         td2.setAttribute('id', 'file-agist-txt-LC' + (i + 1));
-         td2.setAttribute('class', 'blob-code blob-code-inner js-file-line');
-         td2.appendChild(document.createTextNode(rowContent));
+      tr = document.createElement('tr');
+      td1 = document.createElement('td');
+      td2 = document.createElement('td');
    
-         tr.appendChild(td1);
-         tr.appendChild(td2);
-         
-         gistTable.appendChild(tr);
-      }
+      td1.setAttribute('id', 'file-agist-txt-L' + (i + 1));
+      td1.setAttribute('class', 'blob-num js-line-number');
+      td1.setAttribute('data-line-number', (i + 1).toString());
+   
+      td2.setAttribute('id', 'file-agist-txt-LC' + (i + 1));
+      td2.setAttribute('class', 'blob-code blob-code-inner js-file-line');
+      td2.appendChild(document.createTextNode(arrContent[i]));
+
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      
+      gistTable.appendChild(tr);
    }
 
    gistDiv = document.createElement('div');
